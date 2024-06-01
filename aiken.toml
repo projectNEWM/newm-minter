@@ -1,0 +1,21 @@
+name = "projectnewm/newm-minter"
+version = "0.0.1"
+compiler = "v1.0.28-alpha"
+plutus = "v2"
+license = "GPL-3.0-or-later"
+description = "Aiken contracts for project NEWM"
+
+[repository]
+user = "projectNEWM"
+project = "newm-minter"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "1.9.0"
+source = "github"
+
+[[dependencies]]
+name = "logicalmechanism/assist"
+version = "v0.4.9"
+source = "github"
