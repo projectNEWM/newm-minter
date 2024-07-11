@@ -1,4 +1,4 @@
-name = "projectnewm/newm-minter"
+name = "projectNEWM/newm-minter"
 version = "1.0.0"
 compiler = "v1.0.29-alpha"
 plutus = "v2"
