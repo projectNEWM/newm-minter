@@ -105,6 +105,8 @@ fee=$(${cli} transaction build \
     --required-signer-hash ${collat_pkh} \
     --testnet-magic ${testnet_magic})
 
+    # --spending-reference-tx-in-datum-file ../data/storage/updated-metadata-datum.json \
+
 IFS=':' read -ra VALUE <<< "${fee}"
 IFS=' ' read -ra fee <<< "${VALUE[1]}"
 fee=${fee[1]}
