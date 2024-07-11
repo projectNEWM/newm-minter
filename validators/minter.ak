@@ -60,6 +60,7 @@ validator(
             ref_datum.contracts.storage,
             ref_datum.contracts.stake,
           )
+        // the cip 68 metadatum must on the storage address output
         expect _: CIP68 = util.output_datum(outputs, storage_addr, datums)
         //
         // Mint the reference token and 100M fractionals. The reference token
@@ -91,7 +92,7 @@ validator(
         }
       }
       // burn 1 reference or 100M fractionals or both
-      BurnTokens { burn_amt } -> {
+      BurnTokens(burn_amt) -> {
         let Transaction { reference_inputs, extra_signatories, mint, .. } =
           context.transaction
         // data reference stuff

@@ -21,14 +21,14 @@ ${cli} query utxo \
     --address ${reference_address} \
     --out-file ./tmp/reference_utxo.json
 
-TXNS=$(jq length ./tmp/reference_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ./tmp/reference_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${reference_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'to_entries[] | select(.value.value | length < 2) | .key | . + $alltxin + " --tx-in"' ./tmp/reference_utxo.json)
-ref_tx_in=${TXIN::-8}
+txin=$(jq -r --arg alltxin "" 'to_entries[] | select(.value.value | length < 2) | .key | . + $alltxin + " --tx-in"' ./tmp/reference_utxo.json)
+ref_tx_in=${txin::-8}
 changeAmount=$(jq '[.. | objects | .lovelace] | add' ./tmp/reference_utxo.json)
 
 counter=0
@@ -63,15 +63,15 @@ do
     --tx-out-reference-script-file ${contract} \
     --fee 900000
 
-    FEE=$(cardano-cli transaction calculate-min-fee \
+    fee=$(cardano-cli transaction calculate-min-fee \
         --tx-body-file ./tmp/tx.draft \
         ${network} \
         --protocol-params-file ./tmp/protocol.json \
         --tx-in-count 1 \
         --tx-out-count 2 \
         --witness-count 1)
-    echo -e "\033[0;35mFEE: ${FEE} \033[0m"
-    fee=$(echo $FEE | rev | cut -c 9- | rev)
+    echo -e "\033[0;35mfee: ${fee} \033[0m"
+    fee=$(echo $fee | rev | cut -c 9- | rev)
 
     changeAmount=$((${changeAmount} - ${min_utxo} - ${fee}))
 

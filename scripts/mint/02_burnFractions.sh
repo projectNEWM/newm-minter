@@ -49,8 +49,8 @@ ${cli} query utxo \
     --address ${artist_address} \
     --out-file ../tmp/artist_utxo.json
 
-TXNS=$(jq length ../tmp/artist_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/artist_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${artist_address} \033[0m \n";
    exit;
 fi
@@ -60,31 +60,31 @@ artist_tx_in=${TXIN::-8}
 
 # echo "Artist UTxO:" $artist_tx_in
 
-CURRENT_VALUE=$(jq -r --arg policy_id "${policy_id}" --arg token_name "${token_name}" 'to_entries[] | select(.value.value[$policy_id][$token_name]) | .value.value[$policy_id][$token_name]' ../tmp/artist_utxo.json)
-# echo $CURRENT_VALUE
+current_value=$(jq -r --arg policy_id "${policy_id}" --arg token_name "${token_name}" 'to_entries[] | select(.value.value[$policy_id][$token_name]) | .value.value[$policy_id][$token_name]' ../tmp/artist_utxo.json)
+# echo $current_value
 
-BURN_ASSET="-${burnAmt} ${policy_id}.${token_name}"
+burn_asset="-${burnAmt} ${policy_id}.${token_name}"
 
-# echo $BURN_ASSET
+# echo $burn_asset
 
-retAmt=$((${CURRENT_VALUE} - ${burnAmt}))
+retAmt=$((${current_value} - ${burnAmt}))
 
-if [[ CURRENT_VALUE -lt burnAmt ]] ; then
+if [[ current_value -lt burnAmt ]] ; then
     echo "Not Enough Tokens For The Burn"
     exit
 fi
 
-RETURN_ASSET="${retAmt} ${policy_id}.${token_name}"
+return_asset="${retAmt} ${policy_id}.${token_name}"
 
-UTXO_VALUE=$(${cli} transaction calculate-min-required-utxo \
+min_ada=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file ../tmp/protocol.json \
-    --tx-out="${artist_address} + 5000000 + ${RETURN_ASSET}" | tr -dc '0-9')
+    --tx-out="${artist_address} + 5000000 + ${return_asset}" | tr -dc '0-9')
 
 if [[ retAmt -eq 0 ]] ; then
-    artist_address_out="${artist_address} + ${UTXO_VALUE}"
+    artist_address_out="${artist_address} + ${min_ada}"
 else
-    artist_address_out="${artist_address} + ${UTXO_VALUE} + ${RETURN_ASSET}"
+    artist_address_out="${artist_address} + ${min_ada} + ${return_asset}"
 fi
 
 echo "Artist Return OUTPUT:" ${artist_address_out}
@@ -96,8 +96,8 @@ ${cli} query utxo \
     --testnet-magic ${testnet_magic} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
-TXNS=$(jq length ../tmp/collat_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/collat_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${collat_address} \033[0m \n";
    exit;
 fi
@@ -108,7 +108,7 @@ data_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/referenceable-tx.signed
 
 # Add metadata to this build function for nfts with data
 echo -e "\033[0;36m Building Tx \033[0m"
-FEE=$(${cli} transaction build \
+fee=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
     --change-address ${artist_address} \
@@ -120,17 +120,17 @@ FEE=$(${cli} transaction build \
     --required-signer-hash ${keeper1_pkh} \
     --required-signer-hash ${keeper2_pkh} \
     --required-signer-hash ${keeper3_pkh} \
-    --mint="${BURN_ASSET}" \
+    --mint="${burn_asset}" \
     --mint-tx-in-reference="${script_ref_utxo}#1" \
     --mint-plutus-script-v2 \
     --policy-id="${policy_id}" \
     --mint-reference-tx-in-redeemer-file ../data/mint/burn-redeemer.json \
     --testnet-magic ${testnet_magic})
 
-IFS=':' read -ra VALUE <<< "${FEE}"
-IFS=' ' read -ra FEE <<< "${VALUE[1]}"
-FEE=${FEE[1]}
-echo -e "\033[1;32m Fee: \033[0m" $FEE
+IFS=':' read -ra VALUE <<< "${fee}"
+IFS=' ' read -ra fee <<< "${VALUE[1]}"
+fee=${fee[1]}
+echo -e "\033[1;32m Fee: \033[0m" $fee
 #
 # exit
 #

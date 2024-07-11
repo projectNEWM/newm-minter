@@ -22,7 +22,6 @@ keeper1_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets
 keeper2_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/keeper2-wallet/payment.vkey)
 keeper3_pkh=$(${cli} address key-hash --payment-verification-key-file ../wallets/keeper3-wallet/payment.vkey)
 
-
 # asset to trade
 policy_id=$(jq -r '.starterPid' ../../config.json)
 token_name=$(jq -r '.starterTkn' ../../config.json)
@@ -46,14 +45,14 @@ ${cli} query utxo \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
-TXNS=$(jq length ../tmp/newm_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/newm_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${newm_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/newm_utxo.json)
-newm_tx_in=${TXIN::-8}
+txin=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/newm_utxo.json)
+newm_tx_in=${txin::-8}
 
 # get script utxo
 echo -e "\033[0;36m Gathering Script UTxO Information  \033[0m"
@@ -61,14 +60,14 @@ ${cli} query utxo \
     --address ${script_address} \
     --testnet-magic ${testnet_magic} \
     --out-file ../tmp/script_utxo.json
-TXNS=$(jq length ../tmp/script_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/script_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${script_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" --arg policy_id "$policy_id" --arg token_name "$token_name" 'to_entries[] | select(.value.value[$policy_id][$token_name] == 1) | .key | . + $alltxin + " --tx-in"' ../tmp/script_utxo.json)
-script_tx_in=${TXIN::-8}
+txin=$(jq -r --arg alltxin "" --arg policy_id "$policy_id" --arg token_name "$token_name" 'to_entries[] | select(.value.value[$policy_id][$token_name] == 1) | .key | . + $alltxin + " --tx-in"' ../tmp/script_utxo.json)
+script_tx_in=${txin::-8}
 
 # collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
@@ -77,8 +76,8 @@ ${cli} query utxo \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 
-TXNS=$(jq length ../tmp/collat_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/collat_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${collat_address} \033[0m \n";
    exit;
 fi
@@ -88,7 +87,7 @@ collat_tx_in=$(jq -r 'keys[0]' ../tmp/collat_utxo.json)
 script_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/reference-reference-utxo.signed )
 
 echo -e "\033[0;36m Building Tx \033[0m"
-FEE=$(${cli} transaction build \
+fee=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
     --change-address ${newm_address} \
@@ -108,10 +107,10 @@ FEE=$(${cli} transaction build \
     --required-signer-hash ${keeper3_pkh} \
     --testnet-magic ${testnet_magic})
 
-IFS=':' read -ra VALUE <<< "${FEE}"
-IFS=' ' read -ra FEE <<< "${VALUE[1]}"
-FEE=${FEE[1]}
-echo -e "\033[1;32m Fee: \033[0m" $FEE
+IFS=':' read -ra VALUE <<< "${fee}"
+IFS=' ' read -ra fee <<< "${VALUE[1]}"
+fee=${fee[1]}
+echo -e "\033[1;32m Fee: \033[0m" $fee
 #
 # exit
 #

@@ -44,7 +44,7 @@ validator(
     let this_addr: Address = this_input.output.address
     when redeemer is {
       //
-      // removes the utxo entirely from the contract
+      // Removes the utxo from the contract.
       //
       RemoveMeta -> and {
           // must hold correct data token
@@ -68,8 +68,10 @@ validator(
         let that_value: Value =
           this_input.output.value |> value.without_lovelace
         // make sure the output has the datum in the correct form
-        // can be inline or embedded
         expect _: CIP68 = util.output_datum(outputs, this_addr, datums)
+        //
+        //
+        //
         and {
           // must hold correct data token
           values.prove_exact_nft(

@@ -36,8 +36,8 @@ ${cli} query utxo \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
-TXNS=$(jq length ../tmp/newm_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/newm_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${newm_address} \033[0m \n";
    exit;
 fi
@@ -60,25 +60,27 @@ echo -n $ref_name > ../tmp/reference.token
 echo -n $frac_name > ../tmp/fraction.token
 
 
-REFERENCE_ASSET="1 ${policy_id}.${ref_name}"
-FRACTION_ASSET="100000000 ${policy_id}.${frac_name}"
+reference_asset="1 ${policy_id}.${ref_name}"
+fraction_asset="100000000 ${policy_id}.${frac_name}"
 
-MINT_ASSET="1 ${policy_id}.${ref_name} + 100000000 ${policy_id}.${frac_name}"
+mint_asset="1 ${policy_id}.${ref_name} + 100000000 ${policy_id}.${frac_name}"
 
-# echo Minting: ${MINT_ASSET}
-
-UTXO_VALUE=$(${cli} transaction calculate-min-required-utxo \
-    --babbage-era \
-    --protocol-params-file ../tmp/protocol.json \
-    --tx-out-inline-datum-file ../data/storage/empty.metadata-datum.json \
-    --tx-out="${storage_script_address} + 5000000 + ${REFERENCE_ASSET}" | tr -dc '0-9')
-reference_address_out="${storage_script_address} + ${UTXO_VALUE} + ${REFERENCE_ASSET}"
+# echo Minting: ${mint_asset}
 
 min_ada=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file ../tmp/protocol.json \
-    --tx-out="${receiver_address} + 5000000 + ${FRACTION_ASSET}" | tr -dc '0-9')
-fraction_address_out="${receiver_address} + ${min_ada} + ${FRACTION_ASSET}"
+    --tx-out-inline-datum-file ../data/storage/empty.metadata-datum.json \
+    --tx-out="${storage_script_address} + 5000000 + ${reference_asset}" | tr -dc '0-9')
+reference_address_out="${storage_script_address} + ${min_ada} + ${reference_asset}"
+
+# --tx-out-datum-embed-file ../data/storage/empty.metadata-datum.json \
+
+min_ada=$(${cli} transaction calculate-min-required-utxo \
+    --babbage-era \
+    --protocol-params-file ../tmp/protocol.json \
+    --tx-out="${receiver_address} + 5000000 + ${fraction_asset}" | tr -dc '0-9')
+fraction_address_out="${receiver_address} + ${min_ada} + ${fraction_asset}"
 
 echo "Reference Mint OUTPUT:" ${reference_address_out}
 echo "Fraction Mint OUTPUT:" ${fraction_address_out}
@@ -90,8 +92,8 @@ ${cli} query utxo \
     --testnet-magic ${testnet_magic} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
-TXNS=$(jq length ../tmp/collat_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/collat_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${collat_address} \033[0m \n";
    exit;
 fi
@@ -102,7 +104,7 @@ data_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/referenceable-tx.signed
 
 # Add metadata to this build function for nfts with data
 echo -e "\033[0;36m Building Tx \033[0m"
-FEE=$(${cli} transaction build \
+fee=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
     --change-address ${newm_address} \
@@ -114,17 +116,19 @@ FEE=$(${cli} transaction build \
     --tx-out="${fraction_address_out}" \
     --required-signer-hash ${collat_pkh} \
     --required-signer-hash ${newm_pkh} \
-    --mint="${MINT_ASSET}" \
+    --mint="${mint_asset}" \
     --mint-tx-in-reference="${script_ref_utxo}#1" \
     --mint-plutus-script-v2 \
     --policy-id="${policy_id}" \
     --mint-reference-tx-in-redeemer-file ../data/mint/mint-redeemer.json \
     --testnet-magic ${testnet_magic})
 
-IFS=':' read -ra VALUE <<< "${FEE}"
-IFS=' ' read -ra FEE <<< "${VALUE[1]}"
-FEE=${FEE[1]}
-echo -e "\033[1;32m Fee: \033[0m" $FEE
+    # --tx-out-datum-embed-file ../data/storage/empty.metadata-datum.json \
+
+IFS=':' read -ra VALUE <<< "${fee}"
+IFS=' ' read -ra fee <<< "${VALUE[1]}"
+fee=${fee[1]}
+echo -e "\033[1;32m Fee: \033[0m" $fee
 #
 # exit
 #
