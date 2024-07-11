@@ -1,13 +1,14 @@
 use aiken/transaction.{Input, ScriptContext, Spend, Transaction}
 use aiken/transaction/credential.{Address}
-use aiken/transaction/value.{Value}
+use aiken/transaction/value.{AssetName, PolicyId, Value}
 use assist/count
 use assist/find
 use assist/payout
 use assist/signing
+use assist/values
 use newm_minter/types/reference.{ReferenceDatum}
 
-validator {
+validator(starter_pid: PolicyId, starter_tkn: AssetName) {
   fn params(
     this_datum: ReferenceDatum,
     _redeemer: Void,
@@ -47,6 +48,8 @@ validator {
       )?,
       // must be a valid datum update
       reference.valid_datum_update(that_datum)?,
+      // data reference must hold correct token
+      values.prove_exact_nft(that_value, starter_pid, starter_tkn)?,
     }
   }
 }
