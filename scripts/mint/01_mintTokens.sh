@@ -53,8 +53,8 @@ IFS='#' read -ra array <<< "$string"
 prefix_100="000643b0"
 prefix_444="001bc280"
 
-ref_name=$(python3 -c "import sys; sys.path.append('../../lib/py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_100}')")
-frac_name=$(python3 -c "import sys; sys.path.append('../../lib/py/'); from getTokenName import token_name; token_name('${array[0]}', ${array[1]}, '${prefix_444}')")
+ref_name=$(python3 -c "import sys; sys.path.append('../../lib/py/'); from getTokenName import token_name; tkn = token_name('${array[0]}', ${array[1]}, '${prefix_100}'); print(tkn)")
+frac_name=$(python3 -c "import sys; sys.path.append('../../lib/py/'); from getTokenName import token_name; tkn = token_name('${array[0]}', ${array[1]}, '${prefix_444}'); print(tkn)")
 
 echo -n $ref_name > ../tmp/reference.token
 echo -n $frac_name > ../tmp/fraction.token
