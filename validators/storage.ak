@@ -61,7 +61,7 @@ validator(
           count.outputs_by_addr(outputs, this_addr, 0)?,
         }
       //
-      // updates the metadata and change min ada
+      // updates the metadata and change min ada if required
       //
       UpdateMeta -> {
         // that value can increase or decrease lovelace when required
@@ -69,9 +69,6 @@ validator(
           this_input.output.value |> value.without_lovelace
         // make sure the output has the datum in the correct form
         expect _: CIP68 = util.output_datum(outputs, this_addr, datums)
-        //
-        //
-        //
         and {
           // must hold correct data token
           values.prove_exact_nft(
