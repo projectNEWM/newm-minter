@@ -9,7 +9,7 @@ use assist/find
 /// If nothing is found then fail else return data.
 ///
 /// ```aiken
-/// util.output_datum(tx.outputs, this_addr, tx.datums)
+/// util.output_datum(outputs, this_addr, datums)
 /// ```
 pub fn output_datum(
   outputs: List<Output>,

@@ -3,7 +3,6 @@ use aiken/transaction/credential.{PoolId}
 use assist/types/hashes.{PublicKeyHash, ValidatorHash}
 use assist/types/wallet.{Wallet}
 
-// staking info
 pub type Staking {
   pool_id: PoolId,
   reward_wallet: Wallet,
@@ -16,7 +15,6 @@ fn has_valid_staking(staking: Staking) -> Bool {
   }
 }
 
-// keepers are like admins
 pub type Keepers {
   pkhs: List<PublicKeyHash>,
   threshold: Int,
@@ -37,7 +35,9 @@ fn do_has_valid_keepers(
 ) -> Bool {
   when keepers is {
     [] -> and {
+        // some amount of keepers must exist
         counter > 0,
+        // must be equal or greater than threshold
         counter >= threshold,
       }
     [pkh, ..pkhs] ->
@@ -51,7 +51,6 @@ fn do_has_valid_keepers(
   }
 }
 
-// contract validator hashes
 pub type Contracts {
   storage: ValidatorHash,
   stake: ValidatorHash,

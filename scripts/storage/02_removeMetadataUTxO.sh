@@ -44,14 +44,14 @@ ${cli} query utxo \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
-TXNS=$(jq length ../tmp/newm_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/newm_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${newm_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/newm_utxo.json)
-newm_tx_in=${TXIN::-8}
+txin=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' ../tmp/newm_utxo.json)
+newm_tx_in=${txin::-8}
 
 # get script utxo
 echo -e "\033[0;36m Gathering Script UTxO Information  \033[0m"
@@ -59,14 +59,14 @@ ${cli} query utxo \
     --address ${storage_script_address} \
     --testnet-magic ${testnet_magic} \
     --out-file ../tmp/script_utxo.json
-TXNS=$(jq length ../tmp/script_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/script_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${script_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" --arg policy_id "$pid" --arg name "$tkn" 'to_entries[] | select(.value.value[$policy_id][$name] == 1) | .key | . + $alltxin + " --tx-in"' ../tmp/script_utxo.json)
-script_tx_in=${TXIN::-8}
+txin=$(jq -r --arg alltxin "" --arg policy_id "$pid" --arg name "$tkn" 'to_entries[] | select(.value.value[$policy_id][$name] == 1) | .key | . + $alltxin + " --tx-in"' ../tmp/script_utxo.json)
+script_tx_in=${txin::-8}
 echo Storage UTxO: $script_tx_in
 
 # collat info
@@ -76,8 +76,8 @@ ${cli} query utxo \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 
-TXNS=$(jq length ../tmp/collat_utxo.json)
-if [ "${TXNS}" -eq "0" ]; then
+txns=$(jq length ../tmp/collat_utxo.json)
+if [ "${txns}" -eq "0" ]; then
    echo -e "\n \033[0;31m NO UTxOs Found At ${collat_address} \033[0m \n";
    exit;
 fi
@@ -88,7 +88,7 @@ script_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/storage-reference-utx
 data_ref_utxo=$(${cli} transaction txid --tx-file ../tmp/referenceable-tx.signed )
 
 echo -e "\033[0;36m Building Tx \033[0m"
-FEE=$(${cli} transaction build \
+fee=$(${cli} transaction build \
     --babbage-era \
     --out-file ../tmp/tx.draft \
     --change-address ${newm_address} \
@@ -105,10 +105,10 @@ FEE=$(${cli} transaction build \
     --required-signer-hash ${collat_pkh} \
     --testnet-magic ${testnet_magic})
 
-IFS=':' read -ra VALUE <<< "${FEE}"
-IFS=' ' read -ra FEE <<< "${VALUE[1]}"
-FEE=${FEE[1]}
-echo -e "\033[1;32m Fee: \033[0m" $FEE
+IFS=':' read -ra VALUE <<< "${fee}"
+IFS=' ' read -ra fee <<< "${VALUE[1]}"
+fee=${fee[1]}
+echo -e "\033[1;32m Fee: \033[0m" $fee
 #
 # exit
 #
