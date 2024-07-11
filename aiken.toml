@@ -1,9 +1,9 @@
 name = "projectnewm/newm-minter"
-version = "0.0.1"
+version = "1.0.0"
 compiler = "v1.0.29-alpha"
 plutus = "v2"
 license = "GPL-3.0-or-later"
-description = "Aiken contracts for project NEWM"
+description = "Project NEWM's Fractional Minting Contract"
 
 [repository]
 user = "projectNEWM"

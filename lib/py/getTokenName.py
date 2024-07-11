@@ -10,7 +10,7 @@ def token_name(txHash: str, index: int, prefix: str) -> str:
     Args:
         txHash (str): Transaction hash
         index (int): Transaction Index
-        prefix (str): cip68 standard prefix
+        prefix (str): CIP 68 standard prefix
 
     Returns:
         str: The token name.
