@@ -6,18 +6,6 @@ Fractionalization refers to the process of dividing the ownership of streaming r
 
 Please refer to the official documentation for [installation instructions](https://github.com/aiken-lang/aiken?tab=readme-ov-file#installation).
 
-If `cargo` is already on path then this will install the lastest commit.
-
-```
-cargo install --git https://github.com/aiken-lang/aiken.git -f
-```
-
-Or just use the default updater to update aiken to the newest version.
-
-```
-aikup
-```
-
 ### Assist library
 
 Project NEWM uses the Assist libray, a library of specialized Aiken functions for smart contracts on Cardano.
@@ -34,19 +22,17 @@ Set up the `config.json` file with the correct starter token information, NEWM h
 
 The `scripts` folder assumes there will be test wallets inside the `wallets`folder.
 
+```bash
+./create_wallet.sh wallets/artist-wallet
+./create_wallet.sh wallets/collat-wallet
+./create_wallet.sh wallets/reference-wallet
+./create_wallet.sh wallets/keeper1-wallet
+./create_wallet.sh wallets/keeper2-wallet
+./create_wallet.sh wallets/keeper3-wallet
+./create_wallet.sh wallets/newm-wallet
+./create_wallet.sh wallets/reward-wallet
+./create_wallet.sh wallets/starter-wallet
 ```
-artist-wallet
-collat-wallet
-reference-wallet
-keeper1-wallet
-keeper2-wallet
-keeper3-wallet
-newm-wallet
-reward-wallet
-starter-wallet
-```
-
-Use the `create_wallet.sh` script to auto generate simple wallets for testing.
 
 First create the reference scripts with `00_createScriptReferences.sh` found in the scripts folder. This script will use funds held on the reference-wallet to store the smart contracts on UTxOs.
 
