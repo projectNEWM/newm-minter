@@ -13,6 +13,7 @@ function cat_file_or_empty() {
 mkdir -p contracts
 mkdir -p hashes
 mkdir -p certs
+mkdir -p scripts/tmp
 
 # remove old files
 rm contracts/* || true
@@ -29,21 +30,25 @@ aiken build --trace-level silent --filter-traces user-defined
 # keep the traces
 # aiken build --trace-level verbose --filter-traces all
 
+# the reference token
+pid=$(jq -r '.starterPid' config.json)
+tkn=$(jq -r '.starterTkn' config.json)
+
+# cbor representation
+pid_cbor=$(python3 -c "import cbor2;hex_string='${pid}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
+tkn_cbor=$(python3 -c "import cbor2;hex_string='${tkn}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
+
 echo -e "\033[1;33m Convert Reference Contract \033[0m"
+aiken blueprint apply -o plutus.json -v reference.params "${pid_cbor}"
+aiken blueprint apply -o plutus.json -v reference.params "${tkn_cbor}"
 aiken blueprint convert -v reference.params > contracts/reference_contract.plutus
 cardano-cli transaction policyid --script-file contracts/reference_contract.plutus > hashes/reference_contract.hash
 
 # reference hash
 ref=$(cat hashes/reference_contract.hash)
 
-# the reference token
-pid=$(jq -r '.starterPid' config.json)
-tkn=$(jq -r '.starterTkn' config.json)
-
 # cbor representation
 ref_cbor=$(python3 -c "import cbor2;hex_string='${ref}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
-pid_cbor=$(python3 -c "import cbor2;hex_string='${pid}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
-tkn_cbor=$(python3 -c "import cbor2;hex_string='${tkn}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
 
 # The pool to stake at
 poolId=$(jq -r '.poolId' config.json)
@@ -66,9 +71,14 @@ aiken blueprint convert -v storage.params > contracts/storage_contract.plutus
 cardano-cli transaction policyid --script-file contracts/storage_contract.plutus > hashes/storage.hash
 
 echo -e "\033[1;33m Convert Minting Contract \033[0m"
+
+ran=$(jq -r '.random' config.json)
+ran_cbor=$(python3 -c "import cbor2;hex_string='${ran}';data = bytes.fromhex(hex_string);encoded = cbor2.dumps(data);print(encoded.hex())")
+
 aiken blueprint apply -o plutus.json -v minter.params "${pid_cbor}"
 aiken blueprint apply -o plutus.json -v minter.params "${tkn_cbor}"
 aiken blueprint apply -o plutus.json -v minter.params "${ref_cbor}"
+aiken blueprint apply -o plutus.json -v minter.params "${ran_cbor}"
 aiken blueprint convert -v minter.params > contracts/mint_contract.plutus
 cardano-cli transaction policyid --script-file contracts/mint_contract.plutus > hashes/policy.hash
 

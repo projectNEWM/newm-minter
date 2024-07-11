@@ -1,11 +1,13 @@
 {
     "__comment1__": "This is the starter token for the data reference contract",
-    "starterPid": "4d6d1192d39a48f4c80edbe52a5c480bec0a4e0711a998ca016b81a5",
-    "starterTkn": "000643b00103289c658acdbc1f19516855e2d043c379195afbe4dcba5381c836",
+    "starterPid": "b88cdb6d77bcb6ca9a227bab5d0b6a3b4a47960b41cbab4ede0c8b00",
+    "starterTkn": "6ca2a0f0d17ec1732611675702ba9672ab033a6bf7fffb1aaf35cf3caf8b5cc4",
     "__comment2__": "The change address for the starter token transaction",
     "starterChangeAddr": "addr_test1qrvnxkaylr4upwxfxctpxpcumj0fl6fdujdc72j8sgpraa9l4gu9er4t0w7udjvt2pqngddn6q4h8h3uv38p8p9cq82qav4lmp",
     "__comment3__": "This is the initial pool id for staking",
     "poolId": "1e3105f23f2ac91b3fb4c35fa4fe301421028e356e114944e902005b",
     "__comment4__": "The NEWM hot key",
-    "hotKey": "f4a78bbff6d5e7e492915986abc495382247af659018451a25cec92c"
+    "hotKey": "f4a78bbff6d5e7e492915986abc495382247af659018451a25cec92c",
+    "__comment5__": "A random bytestring",
+    "random": "00112233445566778899aabbccddeeff"
   }

@@ -18,6 +18,8 @@ validator(
   starter_pid: PolicyId,
   starter_tkn: AssetName,
   ref_hash: ValidatorHash,
+  // for grinding out a unique policy id
+  _random_string: ByteArray,
 ) {
   fn params(redeemer: MintRedeemer, context: ScriptContext) -> Bool {
     // can only mint
