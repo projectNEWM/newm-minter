@@ -1,4 +1,4 @@
-# Project NEWM's Fractional Minting Contract"
+# Project NEWM's Fractional Minting Contract
 
 Fractionalization refers to the process of dividing the ownership of streaming rights of a piece of art into 100 million pieces. The resulting fractions are given to the artist, who has the freedom to sell or trade them as they wish, or can be sold on the NEWM marketplace with the proceeds going directly to the artist.
 
