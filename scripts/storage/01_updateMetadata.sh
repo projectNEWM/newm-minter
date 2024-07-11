@@ -27,10 +27,10 @@ asset="1 ${pid}.${tkn}"
 min_utxo=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file ../tmp/protocol.json \
-    --tx-out-datum-embed-file ../data/storage/updated-metadata-datum.json \
+    --tx-out-inline-datum-file ../data/storage/updated-metadata-datum.json \
     --tx-out="${storage_script_address} + 5000000 + ${asset}" | tr -dc '0-9')
 
-    # --tx-out-inline-datum-file ../data/storage/updated-metadata-datum.json \
+    # --tx-out-datum-embed-file ../data/storage/updated-metadata-datum.json \
 
 script_address_out="${storage_script_address} + ${min_utxo} + ${asset}"
 echo "Update OUTPUT: "${script_address_out}
@@ -101,12 +101,13 @@ fee=$(${cli} transaction build \
     --spending-reference-tx-in-inline-datum-present \
     --spending-reference-tx-in-redeemer-file ../data/storage/update-redeemer.json \
     --tx-out="${script_address_out}" \
-    --tx-out-datum-embed-file ../data/storage/updated-metadata-datum.json \
+    --tx-out-inline-datum-file ../data/storage/updated-metadata-datum.json \
     --required-signer-hash ${newm_pkh} \
     --required-signer-hash ${collat_pkh} \
     --testnet-magic ${testnet_magic})
 
-    # --tx-out-inline-datum-file ../data/storage/updated-metadata-datum.json \
+    # --spending-reference-tx-in-datum-file ../data/storage/updated-metadata-datum.json \
+    # --tx-out-datum-embed-file ../data/storage/updated-metadata-datum.json \
 
 IFS=':' read -ra VALUE <<< "${fee}"
 IFS=' ' read -ra fee <<< "${VALUE[1]}"

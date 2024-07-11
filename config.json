@@ -1,7 +1,7 @@
 {
     "__comment1__": "This is the starter token for the data reference contract",
-    "starterPid": "8c3fb67a73b7047a77f180f59c089ddf719584813efe6bc5e73a79e8",
-    "starterTkn": "5ca1ab1e000affab1e000ca11ab1e0005e77ab1e",
+    "starterPid": "b88cdb6d77bcb6ca9a227bab5d0b6a3b4a47960b41cbab4ede0c8b00",
+    "starterTkn": "6ca2a0f0d17ec1732611675702ba9672ab033a6bf7fffb1aaf35cf3caf8b5cc4",
     "__comment2__": "The change address for the starter token transaction",
     "starterChangeAddr": "addr_test1qrvnxkaylr4upwxfxctpxpcumj0fl6fdujdc72j8sgpraa9l4gu9er4t0w7udjvt2pqngddn6q4h8h3uv38p8p9cq82qav4lmp",
     "__comment3__": "This is the initial pool id for staking",
