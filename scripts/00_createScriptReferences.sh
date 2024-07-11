@@ -12,7 +12,8 @@ mkdir -p ./tmp
 ${cli} query protocol-parameters ${network} --out-file ./tmp/protocol.json
 
 # Addresses
-reference_address=$(cat ./wallets/reference-wallet/payment.addr)
+reference_path="./wallets/reference-wallet"
+reference_address=$(cat ${reference_path}/payment.addr)
 script_reference_address=$(cat ./wallets/reference-wallet/payment.addr)
 
 echo -e "\033[0;35m\nGathering UTxO Information  \033[0m"
@@ -29,6 +30,9 @@ fi
 alltxin=""
 txin=$(jq -r --arg alltxin "" 'to_entries[] | select(.value.value | length < 2) | .key | . + $alltxin + " --tx-in"' ./tmp/reference_utxo.json)
 ref_tx_in=${txin::-8}
+
+echo -e "\033[0;36mFirst UTxO: $ref_tx_in \033[0m"
+
 changeAmount=$(jq '[.. | objects | .lovelace] | add' ./tmp/reference_utxo.json)
 
 counter=0
@@ -86,7 +90,7 @@ do
         --fee ${fee}
 
     ${cli} transaction sign \
-        --signing-key-file ./wallets/reference-wallet/payment.skey \
+        --signing-key-file ${reference_path}/payment.skey \
         --tx-body-file ./tmp/tx.draft \
         --out-file ./tmp/${first_word}-reference-utxo.signed \
         ${network}
