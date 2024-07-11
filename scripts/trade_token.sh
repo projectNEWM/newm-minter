@@ -1,5 +1,6 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -e
+
 #
 rm tmp/tx.signed || true
 export CARDANO_NODE_SOCKET_PATH=$(cat ./data/path_to_socket.sh)
