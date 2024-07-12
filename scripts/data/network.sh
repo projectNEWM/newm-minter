@@ -1,0 +1,1 @@
+--testnet-magic 1
