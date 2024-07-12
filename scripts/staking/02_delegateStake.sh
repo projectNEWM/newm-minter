@@ -3,10 +3,10 @@ set -e
 
 export CARDANO_NODE_SOCKET_PATH=$(cat ../data/path_to_socket.sh)
 cli=$(cat ../data/path_to_cli.sh)
-testnet_magic=$(cat ../data/testnet.magic)
+network=$(cat ../data/network.sh)
 
 # get params
-${cli} query protocol-parameters --testnet-magic ${testnet_magic} --out-file ../tmp/protocol.json
+${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
 # collateral for stake contract
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
@@ -24,7 +24,7 @@ newm_address=$(cat ../wallets/newm-wallet/payment.addr)
 #
 echo -e "\033[0;36m Gathering Payee UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
@@ -40,7 +40,7 @@ newm_tx_in=${txin::-8}
 # collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 
@@ -70,7 +70,7 @@ fee=$(${cli} transaction build \
     --required-signer-hash ${keeper1_pkh} \
     --required-signer-hash ${keeper2_pkh} \
     --required-signer-hash ${keeper3_pkh} \
-    --testnet-magic ${testnet_magic})
+    ${network})
 
 IFS=':' read -ra VALUE <<< "${fee}"
 IFS=' ' read -ra fee <<< "${VALUE[1]}"
@@ -88,13 +88,13 @@ ${cli} transaction sign \
     --signing-key-file ../wallets/keeper3-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/tx.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 #    
 # exit
 #
 echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ../tmp/tx.signed
 
 tx=$(cardano-cli transaction txid --tx-file ../tmp/tx.signed)

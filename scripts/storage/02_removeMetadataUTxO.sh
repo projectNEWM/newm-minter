@@ -3,14 +3,14 @@ set -e
 
 export CARDANO_NODE_SOCKET_PATH=$(cat ../data/path_to_socket.sh)
 cli=$(cat ../data/path_to_cli.sh)
-testnet_magic=$(cat ../data/testnet.magic)
+network=$(cat ../data/network.sh)
 
 # staking contract
 stake_script_path="../../contracts/stake_contract.plutus"
 
 # cip 68 contract
 storage_script_path="../../contracts/storage_contract.plutus"
-storage_script_address=$(${cli} address build --payment-script-file ${storage_script_path} --stake-script-file ${stake_script_path} --testnet-magic ${testnet_magic})
+storage_script_address=$(${cli} address build --payment-script-file ${storage_script_path} --stake-script-file ${stake_script_path} ${network})
 
 # collat
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
@@ -40,7 +40,7 @@ echo "Remove OUTPUT: "${artist_address_out}
 # get deleg utxo
 echo -e "\033[0;36m Gathering UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
@@ -57,7 +57,7 @@ newm_tx_in=${txin::-8}
 echo -e "\033[0;36m Gathering Script UTxO Information  \033[0m"
 ${cli} query utxo \
     --address ${storage_script_address} \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --out-file ../tmp/script_utxo.json
 txns=$(jq length ../tmp/script_utxo.json)
 if [ "${txns}" -eq "0" ]; then
@@ -72,7 +72,7 @@ echo Storage UTxO: $script_tx_in
 # collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 
@@ -103,7 +103,7 @@ fee=$(${cli} transaction build \
     --tx-out="${artist_address_out}" \
     --required-signer-hash ${newm_pkh} \
     --required-signer-hash ${collat_pkh} \
-    --testnet-magic ${testnet_magic})
+    ${network})
 
     # --spending-reference-tx-in-datum-file ../data/storage/updated-metadata-datum.json \
 
@@ -120,13 +120,13 @@ ${cli} transaction sign \
     --signing-key-file ../wallets/collat-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/tx.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 #
 # exit
 #
 echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ../tmp/tx.signed
 
 tx=$(cardano-cli transaction txid --tx-file ../tmp/tx.signed)

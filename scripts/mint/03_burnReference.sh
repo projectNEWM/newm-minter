@@ -3,14 +3,14 @@ set -e
 
 export CARDANO_NODE_SOCKET_PATH=$(cat ../data/path_to_socket.sh)
 cli=$(cat ../data/path_to_cli.sh)
-testnet_magic=$(cat ../data/testnet.magic)
+network=$(cat ../data/network.sh)
 
 # update the starting lock time
 variable=0; jq --argjson variable "$variable" '.fields[0].int=$variable' ../data/mint/burn-redeemer.json > ../data/mint/burn-redeemer-new.json
 mv ../data/mint/burn-redeemer-new.json ../data/mint/burn-redeemer.json
 
 # get params
-${cli} query protocol-parameters --testnet-magic ${testnet_magic} --out-file ../tmp/protocol.json
+${cli} query protocol-parameters ${network} --out-file ../tmp/protocol.json
 
 # collateral
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
@@ -31,7 +31,7 @@ token_name=$(cat ../tmp/reference.token)
 
 echo -e "\033[0;36m Gathering Artist UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${artist_address} \
     --out-file ../tmp/artist_utxo.json
 
@@ -51,7 +51,7 @@ burn_asset="-1 ${policy_id}.${token_name}"
 #
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 txns=$(jq length ../tmp/collat_utxo.json)
@@ -82,7 +82,7 @@ fee=$(${cli} transaction build \
     --mint-plutus-script-v2 \
     --policy-id="${policy_id}" \
     --mint-reference-tx-in-redeemer-file ../data/mint/burn-redeemer.json \
-    --testnet-magic ${testnet_magic})
+    ${network})
 
 IFS=':' read -ra VALUE <<< "${fee}"
 IFS=' ' read -ra fee <<< "${VALUE[1]}"
@@ -100,13 +100,13 @@ ${cli} transaction sign \
     --signing-key-file ../wallets/keeper3-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/tx.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 #    
 # exit
 #
 echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ../tmp/tx.signed
 
 tx=$(cardano-cli transaction txid --tx-file ../tmp/tx.signed)

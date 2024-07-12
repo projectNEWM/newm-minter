@@ -4,8 +4,7 @@ set -e
 # SET UP VARS HERE
 export CARDANO_NODE_SOCKET_PATH=$(cat ./data/path_to_socket.sh)
 cli=$(cat ./data/path_to_cli.sh)
-testnet_magic=$(cat ./data/testnet.magic)
-network="--testnet-magic ${testnet_magic}"
+network=$(cat ./data/network.sh)
 
 
 mkdir -p ./tmp

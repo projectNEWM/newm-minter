@@ -3,11 +3,11 @@ set -e
 
 export CARDANO_NODE_SOCKET_PATH=$(cat ../data/path_to_socket.sh)
 cli=$(cat ../data/path_to_cli.sh)
-testnet_magic=$(cat ../data/testnet.magic)
+network=$(cat ../data/network.sh)
 
 # staked smart contract address
 script_path="../../contracts/reference_contract.plutus"
-script_address=$(${cli} address build --payment-script-file ${script_path} --testnet-magic ${testnet_magic})
+script_address=$(${cli} address build --payment-script-file ${script_path} ${network})
 
 # collat
 collat_address=$(cat ../wallets/collat-wallet/payment.addr)
@@ -41,7 +41,7 @@ echo "Script OUTPUT: "${script_address_out}
 # get deleg utxo
 echo -e "\033[0;36m Gathering UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${newm_address} \
     --out-file ../tmp/newm_utxo.json
 
@@ -58,7 +58,7 @@ newm_tx_in=${txin::-8}
 echo -e "\033[0;36m Gathering Script UTxO Information  \033[0m"
 ${cli} query utxo \
     --address ${script_address} \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --out-file ../tmp/script_utxo.json
 txns=$(jq length ../tmp/script_utxo.json)
 if [ "${txns}" -eq "0" ]; then
@@ -72,7 +72,7 @@ script_tx_in=${txin::-8}
 # collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
 ${cli} query utxo \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --address ${collat_address} \
     --out-file ../tmp/collat_utxo.json
 
@@ -105,7 +105,7 @@ fee=$(${cli} transaction build \
     --required-signer-hash ${keeper1_pkh} \
     --required-signer-hash ${keeper2_pkh} \
     --required-signer-hash ${keeper3_pkh} \
-    --testnet-magic ${testnet_magic})
+    ${network})
 
 IFS=':' read -ra VALUE <<< "${fee}"
 IFS=' ' read -ra fee <<< "${VALUE[1]}"
@@ -123,13 +123,13 @@ ${cli} transaction sign \
     --signing-key-file ../wallets/keeper3-wallet/payment.skey \
     --tx-body-file ../tmp/tx.draft \
     --out-file ../tmp/referenceable-tx.signed \
-    --testnet-magic ${testnet_magic}
+    ${network}
 #
 # exit
 #
 echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
-    --testnet-magic ${testnet_magic} \
+    ${network} \
     --tx-file ../tmp/referenceable-tx.signed
 
 tx=$(cardano-cli transaction txid --tx-file ../tmp/referenceable-tx.signed)
